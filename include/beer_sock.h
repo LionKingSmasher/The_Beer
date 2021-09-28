@@ -1,15 +1,17 @@
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <arpa/inet.h>
-#include <iostream>:
+#include <iostream>
 
 class BeerSock {
 protected:
 	struct sockaddr_in clientSock;
 	struct sockaddr_in serverSock;
 public:
-	BeerSock(const char *, int);
-	BeerSock(std::string, int);
+	BeerSock(const char *, uint16_t);
+	BeerSock(std::string, uint16_t);
 	~BeerSock();
-	virtual void start(const BeerSock *)=0;
-	virtual void stop()=0;
-	virtual void end()=0;
+	virtual int start();
+	virtual int stop();
+	virtual void end();
 };
