@@ -76,6 +76,9 @@ void BeerSock::server_end(){
 }
 
 BeerSockStatus_t BeerSock::connectServer(const char* ip, uint16_t port){
+#if DEBUG == 1
+	char* serverMsg = (char*)malloc(256);
+#endif
 	my_clnt_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(my_clnt_sock == -1)
 		error_msg("socket error", -1);
@@ -84,6 +87,11 @@ BeerSockStatus_t BeerSock::connectServer(const char* ip, uint16_t port){
 	otherServerAddr.sin_port = port;
 	if(connect(my_clnt_sock, (struct sockaddr*)&otherServerAddr, sizeof(otherServerAddr)) == -1)
 		error_msg("connect error", -1);
+#if DEBUG == 1
+	read(my_clnt_sock, serverMsg, 20);
+	close(my_clnt_sock);
+	free(serverMsg);
+#endif
 	return BEERSOCK_SUCCESS;
 }
 
