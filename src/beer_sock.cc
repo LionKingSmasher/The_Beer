@@ -7,6 +7,7 @@
 #include <signal.h>
 
 static inline void error_msg(const char * msg, int code){
+	printf("%s\n", strerror(errno));
 	fputs(msg, stderr);
 	fputc('\n', stderr);
 	exit(code);
@@ -50,6 +51,7 @@ BeerSockStatus_t BeerSock::server_start(){
 		if(listen(server_sock, 5) == -1)
 			error_msg("listn() error", -1);
 
+		printf("listen...");
 		clntSockSize = sizeof(clntAddr);
 		other_clnt_sock = accept(server_sock, (struct sockaddr *)&clntAddr, &clntSockSize);
 		if(other_clnt_sock == -1)
