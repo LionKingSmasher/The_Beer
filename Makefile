@@ -1,5 +1,6 @@
 CC=gcc
 AR=ar
+ASM=nasm
 
 LIBNAME= libbeer# Library Name
 LIBVER= 20210928# Library Version
@@ -29,7 +30,8 @@ all:
 
 install:
 	cp $(HEADER) $(OUTPUT_FOLD)/
-	zip -r $(INSTALL_FILE) ./$(OUTPUT_FOLD)
+	zip -r $(INSTALL_FILE) ./$(OUTPUT_FOLD)/*
+	rm -rf $(OUTPUT_FOLD)
 
 clear:
 	rm -rf $(OUTPUT_FOLD) $(OBJS) $(LIB) 
