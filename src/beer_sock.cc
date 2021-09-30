@@ -1,5 +1,6 @@
 #include <beer_sock.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
@@ -61,6 +62,8 @@ BeerSockStatus_t BeerSock::server_start(){
 		exit(0);
 	}
 	wait(&waitStatus);
+	if(WEXITSTATUS(waitStatus) == -1)
+		return BEERSOCK_FAIL;
 	return BEERSOCK_SUCCESS;
 }
 
