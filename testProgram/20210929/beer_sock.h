@@ -34,8 +34,8 @@ protected:
 
 	pid_t serverProc;
 public:
-	BeerSock(const char *, uint16_t);
-	BeerSock(std::string, uint16_t);
+	BeerSock(uint16_t);
+//	BeerSock(std::string, uint16_t);
 	~BeerSock();
 	virtual BeerSockStatus_t server_start();
 	virtual BeerSockStatus_t server_stop();

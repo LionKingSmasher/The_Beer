@@ -19,7 +19,7 @@ BeerSock::~BeerSock(){
 	close(this->other_clnt_sock);
 }
 
-BeerSock::BeerSock(const char * address, uint16_t port){
+BeerSock::BeerSock(uint16_t port){
 #define o(X) memset(&X, 0, sizeof(X))
 	o(this->serverAddr);
 	o(this->clntAddr);
@@ -27,12 +27,14 @@ BeerSock::BeerSock(const char * address, uint16_t port){
 #undef o
 	this->serverAddr.sin_family = AF_INET;
 	this->serverAddr.sin_port = htons(port);
-	this->serverAddr.sin_addr.s_addr = inet_addr(address);
+	this->serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 }
 
+/*
 BeerSock::BeerSock(std::string address, uint16_t port){
 	BeerSock(address.c_str(), port);
 }
+*/
 
 BeerSockStatus_t BeerSock::server_start(){
 #if DEBUG == 1
