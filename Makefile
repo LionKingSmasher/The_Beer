@@ -8,6 +8,7 @@ LIBVER= 20210928# Library Version
 OUTPUT_FOLD= output
 
 OBJS= \
+      	src/beer_zip.o \
         src/beer_sock.o
 
 LIB= \
@@ -15,7 +16,8 @@ LIB= \
 
 HEADER= \
 	include/beer.h \
-	include/beer_sock.h
+	include/beer_sock.h \
+	include/beer_zip.h
 
 INSTALL_FILE= \
 	      $(LIBNAME)-$(LIBVER).zip

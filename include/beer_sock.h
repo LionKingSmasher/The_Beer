@@ -45,7 +45,7 @@ public:
 	~BeerSock();
 	virtual BeerSockStatus_t server_start();                        // Server Start
 	virtual BeerSockStatus_t server_stop();                         // Server Stop 
-	virtual void server_end();                                      // Server End
+	virtual BeerSockStatus_t server_end();                                      // Server End
 	virtual BeerSockStatus_t connectServer(const char *, uint16_t); // Connect to p2p server
 	virtual BeerSockStatus_t connectServer(std::string, uint16_t);  // Connect to p2p server if your input is std::string type
 	virtual BeerSockStatus_t writeServer(const char *);             // Write message to client

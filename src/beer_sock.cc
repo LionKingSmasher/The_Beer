@@ -80,16 +80,16 @@ BeerSockStatus_t BeerSock::server_start(){
 }
 
 BeerSockStatus_t BeerSock::server_stop(){
-	BEERSOCK_FAILURE(close(this->server_sock)){
+	BEER_SOCK_FAILURE(close(this->server_sock)){
 		return BEERSOCK_FAIL;
 	}
 	return BEERSOCK_SUCCESS;
 }
 
-void BeerSock::server_end(){
-#define o(X) BEERSOCK_FAILURE(X) { \
+BeerSockStatus_t BeerSock::server_end(){
+#define o(X) BEER_SOCK_FAILURE(X) { \
 		printf("Server End Error!\n"); \
-		printf("%d\n", strerror(errno)); \
+		printf("%s\n", strerror(errno)); \
 		return BEERSOCK_FAIL; \
 	     }
 	o(close(this->server_sock));
