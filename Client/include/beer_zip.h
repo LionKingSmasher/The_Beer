@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 
 // ======================= Beer Zip Macros ==========================
 #define LOOK_BUF  0x06
@@ -53,10 +54,13 @@ enum BeerZipStatus_t {
 BeerZipStatus_t beerSockZip(const char*, std::vector<struct LZ77_t>&);
 
 class BeerZip{
-private:
-	int fd; // file descriptor
+protected:
 	std::vector<struct LZ77_t> lz77_buffer;
 public:
+	BeerZip();
+	~BeerZip();
 	virtual BeerZipStatus_t compress(const char*);
+	virtual BeerZipStatus_t compress(std::string);
 	virtual BeerZipStatus_t uncompress(const char*);
+	virtual BeerZipStatus_t uncompress(std::string);
 };

@@ -15,7 +15,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
-#include <signal.h>
+// #include <signal.h>
 
 static inline void error_msg(const char * msg, int code){
 	printf("%s\n", strerror(errno));
@@ -91,12 +91,13 @@ BeerSockStatus_t BeerSock::server_end(){
 		printf("Server End Error!\n"); \
 		printf("%s\n", strerror(errno)); \
 		return BEERSOCK_FAIL; \
-	     }
+	    }
 	o(close(this->server_sock));
 	o(close(this->my_clnt_sock));
 	o(close(this->other_clnt_sock));
 #undef o
 	printf("end\n");
+	return BEERSOCK_SUCCESS;
 }
 
 BeerSockStatus_t BeerSock::connectServer(const char* ip, uint16_t port){
