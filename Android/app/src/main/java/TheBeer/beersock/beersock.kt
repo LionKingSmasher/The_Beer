@@ -1,13 +1,11 @@
 package TheBeer.beersock
 
+import java.io.*
 import java.lang.Exception
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
 import java.net.Socket
 import java.net.InetSocketAddress
 import java.net.ServerSocket
+import java.net.UnknownHostException
 
 enum class BeerSockStatus {
     BEERSOCK_FAIL,
@@ -24,9 +22,14 @@ class BeerSock(port: Int) {
     var my_clnt_sock : Socket? = Socket()    // My client Socket
     var other_clnt_sock : Socket? = Socket() // Other Client Socket
 
-    var server_buffer : BufferedReader? = null
-    var my_clnt_buffer : BufferedWriter? = null
-    var other_clnt_buffer : BufferedWriter? = null
+    var my_clnt_buffer : OutputStream? = null
+    var other_clnt_buffer : InputStream? = null
+
+    var clntMessage : ByteArray = ByteArray(1024) { 0 }
+    var msgSize : Int = 0
+
+    var MyClntMessage : ByteArray = ByteArray(1024) { 0 }
+    var MyMsgSize : Int = 0
 
     init {
         server_sock = ServerSocket(port)
@@ -36,6 +39,7 @@ class BeerSock(port: Int) {
         other_clnt_sock = server_sock?.accept() ?: null
         if(other_clnt_sock == null)
             return BeerSockStatus.BEERSOCK_FAIL
+        other_clnt_buffer = other_clnt_sock?.getInputStream()
         return BeerSockStatus.BEERSOCK_SUCCESS
     }
 
@@ -44,18 +48,34 @@ class BeerSock(port: Int) {
     }
 
     fun server_end() : BeerSockStatus {
+        try{
+            server_sock?.close()
+        }
+        catch(e: Exception){
+            return BeerSockStatus.BEERSOCK_FAIL
+        }
         return BeerSockStatus.BEERSOCK_SUCCESS
     }
 
     fun connectServer(ip: String, port: Int) : BeerSockStatus {
+        server_addr = InetSocketAddress(ip, port)
+        try{
+            my_clnt_sock?.connect(server_addr)
+        }
+        catch(ex: UnknownHostException) {
+            return BeerSockStatus.BEERSOCK_FAIL
+        }
+        my_clnt_buffer = my_clnt_sock?.getOutputStream()
         return BeerSockStatus.BEERSOCK_SUCCESS
     }
 
     fun writeServer(msg: String) : BeerSockStatus {
+        MyClntMessage = msg.toByteArray()
         return BeerSockStatus.BEERSOCK_SUCCESS
     }
 
-    fun readClient(msg: String) : BeerSockStatus {
-        return BeerSockStatus.BEERSOCK_SUCCESS
+    fun readClient() : ByteArray {
+        msgSize = other_clnt_buffer!!.read(clntMessage)
+        return clntMessage
     }
 }
