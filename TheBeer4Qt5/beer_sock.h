@@ -40,8 +40,6 @@ protected:
 
 	pid_t serverProc;
 	int status;
-
-	char* msg;
 public:
 	BeerSock(const char*, uint16_t);
 	BeerSock(std::string, uint16_t);

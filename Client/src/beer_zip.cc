@@ -8,15 +8,16 @@
  *  Description: It is Beer's zip function file
  *
  * */
-
+//============ Standard =============
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+//============== POSIX ==============
 #include <fcntl.h>
 #include <unistd.h>
-
+//============= Custom ==============
 #include <beer_zip.h>
+//===================================
 
 static inline void beerSockErrorMsg(const char *msg){
 	fputs(msg, stderr);
@@ -82,6 +83,7 @@ BeerZipStatus_t beerSockZip(const char* str, std::vector<struct LZ77_t>& lz77_ve
 }
 
 BeerZip::BeerZip(){
+
 }
 
 BeerZip::~BeerZip(){

@@ -15,7 +15,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <stdlib.h>
-// #include <signal.h>
+#include <signal.h>
 
 static inline void error_msg(const char * msg, int code){
 	printf("%s\n", strerror(errno));
@@ -25,9 +25,11 @@ static inline void error_msg(const char * msg, int code){
 }
 
 BeerSock::~BeerSock(){
+	free(msg);
 	close(this->server_sock);
 	close(this->my_clnt_sock);
 	close(this->other_clnt_sock);
+	kill(serverProc, SIGINT);
 }
 
 BeerSock::BeerSock(const char* ip, uint16_t port){
@@ -39,6 +41,7 @@ BeerSock::BeerSock(const char* ip, uint16_t port){
 	this->serverAddr.sin_family = AF_INET;
 	this->serverAddr.sin_port = inet_addr(ip);
 	this->serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	this->msg = (char *)malloc(sizeof(char) * 1024);
 }
 
 BeerSock::BeerSock(std::string address, uint16_t port){
@@ -63,19 +66,29 @@ BeerSockStatus_t BeerSock::server_start(){
 
 		printf("listen()....\n");
 		if(listen(server_sock, 5) == -1)
-			error_msg("listn() error", -1);
+			error_msg("listen() error", -1);
 
 		printf("accrpt()....\n");
 		clntSockSize = sizeof(clntAddr);
 		other_clnt_sock = accept(server_sock, (struct sockaddr *)&clntAddr, &clntSockSize);
 		if(other_clnt_sock == -1)
 			error_msg("accept() error", -1);
+		this->connectServer(inet_ntoa(clntAddr.sin_addr), clntAddr.sin_port);
+		
+		while(1){
+			BEER_SOCK_FAILURE(read(this->other_clnt_sock, msg, 1024)){
+				msg[0] = '\0';
+			}
+		}
+		// exit(BEERSOCK_SUCCESS);
 #if DEBUG == 1
 //		write(other_clnt_sock, serverMessage, strlen(serverMessage));
 //		close(other_clnt_sock);
 //		close(server_sock);
 #endif
 	}
+	if(serverProc == -1)
+		return BEERSOCK_FAIL;
 	return BEERSOCK_SUCCESS;
 }
 
@@ -91,12 +104,13 @@ BeerSockStatus_t BeerSock::server_end(){
 		printf("Server End Error!\n"); \
 		printf("%s\n", strerror(errno)); \
 		return BEERSOCK_FAIL; \
-	    }
+		}
 	o(close(this->server_sock));
 	o(close(this->my_clnt_sock));
 	o(close(this->other_clnt_sock));
+	kill(serverProc, SIGINT);
 #undef o
-	printf("end\n");
+	// printf("end\n");
 	return BEERSOCK_SUCCESS;
 }
 

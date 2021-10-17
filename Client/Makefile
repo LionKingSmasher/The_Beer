@@ -3,13 +3,15 @@ AR=ar
 ASM=nasm
 
 LIBNAME= libbeer# Library Name
-LIBVER= 20210928# Library Version
+LIBVER= 20211015# Library Version
 
 OUTPUT_FOLD= output
 
 OBJS= \
+	src/beer.o \
       	src/beer_zip.o \
-        src/beer_sock.o
+        src/beer_sock.o \
+        src/beer_base64.o
 
 LIB= \
         $(OUTPUT_FOLD)/libbeer.a
