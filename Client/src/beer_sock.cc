@@ -39,8 +39,8 @@ BeerSock::BeerSock(const char* ip, uint16_t port){
 	o(this->otherServerAddr);
 #undef o
 	this->serverAddr.sin_family = AF_INET;
-	this->serverAddr.sin_port = inet_addr(ip);
-	this->serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	this->serverAddr.sin_port = htons(port);
+	this->serverAddr.sin_addr.s_addr = inet_addr(ip);
 	this->msg = (char *)malloc(sizeof(char) * 1024);
 }
 
@@ -125,8 +125,7 @@ BeerSockStatus_t BeerSock::connectServer(const char* ip, uint16_t port){
 	otherServerAddr.sin_addr.s_addr=inet_addr(ip);
 	otherServerAddr.sin_port = htons(port);
 	printf("%x %x\n", otherServerAddr.sin_port, port);
-	if(connect(my_clnt_sock, (struct sockaddr*)&otherServerAddr, sizeof(otherServerAddr)) == -1)
-		error_msg("connect error", -1);
+	connect(my_clnt_sock, (struct sockaddr*)&otherServerAddr, sizeof(otherServerAddr));
 #if DEBUG == 1
 //	read(my_clnt_sock, serverMsg, 20);
 //	close(my_clnt_sock);

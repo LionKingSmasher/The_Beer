@@ -39,7 +39,6 @@ protected:
 	int other_clnt_sock;   // Other people p2p client
 
 	pid_t serverProc;
-        pid_t clientProc;
 	int status;
 
 	char* msg;

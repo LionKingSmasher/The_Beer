@@ -23,6 +23,8 @@ private slots:
 
     void on_Server_Start_Button_clicked();
 
+    void on_ConnectButton_clicked();
+
 private:
     static constexpr char* my_ip = "10.80.163.172";
     Ui::ClientWindow *ui;
