@@ -2,8 +2,8 @@
 #include <iostream>
 
 // ======================= Beer Zip Macros ==========================
-#define LOOK_BUF  0x06
-#define WIN_BUF   0x08
+#define LOOK_BUF  0x7E
+#define WIN_BUF   0x80
 #define POINT_BUF WIN_BUF
 #define MAX_BUF_SIZE LOOK_BUF + WIN_BUF - 1
 
@@ -14,9 +14,9 @@
 typedef unsigned char u8;
 
 struct LZ77_t {
-	int dist;  // distance
-	int len;   // length
-	u8  data;  // data
+	u8 dist;  // distance
+	u8 len;   // length
+	u8 data;  // data
 };
 
 struct LZ77_Buffer_t {
@@ -51,7 +51,8 @@ enum BeerZipStatus_t {
 	BEERZIP_SUCCESS
 };
 
-BeerZipStatus_t beerSockZip(const char*, std::vector<struct LZ77_t>&);
+BeerZipStatus_t beerSockZip(const unsigned char*, std::vector<struct LZ77_t>&, long);
+unsigned long beerSockUnZip(unsigned char*, std::vector<struct LZ77_t>&, long, unsigned long*);
 
 class BeerZip{
 protected:

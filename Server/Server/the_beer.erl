@@ -23,9 +23,7 @@ handler(ASocket) ->
     receive
         {tcp, ASocket, <<"done">>} ->
             gen_tcp:close(ASocket);
-        {tcp, ASocket, <<"test">>} ->
-            gen_tcp:send(ASocket, "Welcome Server!"),
-            handler(ASocket);
+        {tcp, ASocket, <<"">>}
         {tcp, ASocket, BinaryMSG} ->
             gen_tcp:send(ASocket, "Your MSG: " ++ BinaryMSG),
             handler(ASocket)
