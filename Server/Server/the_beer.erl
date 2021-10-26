@@ -29,7 +29,7 @@ handler(ASocket) ->
         {tcp, ASocket, <<"done">>} ->
             gen_tcp:close(ASocket);
         {tcp, ASocket, <<"get ip id=", X/binary>>} ->
-            
+            gen_tcp:close(ASocket);
         {tcp, ASocket, BinaryMSG} ->
             gen_tcp:send(ASocket, "Your MSG: " ++ BinaryMSG),
             handler(ASocket)
