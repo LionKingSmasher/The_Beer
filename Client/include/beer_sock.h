@@ -13,8 +13,9 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include <pthread.h>
+#include <thread>
 #include <iostream>
+#include <mutex>
 
 #define DEBUG 1 // Debug Mode
 
@@ -29,21 +30,26 @@ enum BeerSockStatus_t {
 };
 
 class BeerSock {
-protected:
+	
+public:
+	std::mutex mtx;
+
 	struct sockaddr_in serverAddr;      // My server address
 	struct sockaddr_in otherServerAddr; // Other person server address
 	struct sockaddr_in clntAddr;        // Other person client address
-	
+
 	int server_sock;       // My p2p server
 	int my_clnt_sock;      // My p2p client
 	int other_clnt_sock;   // Other people p2p client
 
-	pid_t serverProc;
-	pid_t clinetProc;
+	std::thread serverProc;
+	std::thread clinetProc;
 	int status;
 
-	char* msg;
-public:
+	bool server_open;
+
+	char msg[1024];
+	
 	BeerSock(const char*, uint16_t);
 	BeerSock(std::string, uint16_t);
 	virtual ~BeerSock();
@@ -54,5 +60,5 @@ public:
 	BeerSockStatus_t connectServer(std::string, uint16_t);  // Connect to p2p server if your input is std::string type
 	BeerSockStatus_t writeServer(const char *);             // Write message to client
 	BeerSockStatus_t writeServer(std::string);              // Write message to client if your input is std::string type
-	BeerSockStatus_t readClient(char **);                   // Read message from client
+	BeerSockStatus_t readClient();                   // Read message from client
 };

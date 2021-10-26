@@ -2,6 +2,11 @@
 -author("Shin Hyun Kyu").
 
 -export([start_server/0]).
+-import(the_beer_dbms, [
+            dbms_init/0,
+            create_database/1,
+            create_table/3
+        ]).
 
 -include("ip.hrl").
 
@@ -23,7 +28,8 @@ handler(ASocket) ->
     receive
         {tcp, ASocket, <<"done">>} ->
             gen_tcp:close(ASocket);
-        {tcp, ASocket, <<"">>}
+        {tcp, ASocket, <<"get ip id=", X/binary>>} ->
+            
         {tcp, ASocket, BinaryMSG} ->
             gen_tcp:send(ASocket, "Your MSG: " ++ BinaryMSG),
             handler(ASocket)

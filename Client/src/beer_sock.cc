@@ -29,7 +29,6 @@ BeerSock::~BeerSock(){
 	close(this->server_sock);
 	close(this->my_clnt_sock);
 	close(this->other_clnt_sock);
-	kill(serverProc, SIGINT);
 }
 
 BeerSock::BeerSock(const char* ip, uint16_t port){
@@ -38,14 +37,38 @@ BeerSock::BeerSock(const char* ip, uint16_t port){
 	o(this->clntAddr);
 	o(this->otherServerAddr);
 #undef o
+	this->server_open = false;
 	this->serverAddr.sin_family = AF_INET;
 	this->serverAddr.sin_port = htons(port);
 	this->serverAddr.sin_addr.s_addr = inet_addr(ip);
-	this->msg = (char *)malloc(sizeof(char) * 1024);
 }
 
 BeerSock::BeerSock(std::string address, uint16_t port){
 	BeerSock(address.c_str(), port);
+}
+
+static void serverBinding(BeerSock* s){
+	s->mtx.lock();
+	socklen_t clntSockSize;
+	if(s->server_sock == -1)
+		error_msg("socket() error", -1);
+
+	if(bind(s->server_sock, (struct sockaddr*)&s->serverAddr, sizeof(s->serverAddr)) == -1)
+		error_msg("bind() error", -1);
+
+	printf("listen()....\n");
+	if(listen(s->server_sock, 5) == -1)
+		error_msg("listen() error", -1);
+
+	printf("accrpt()....\n");
+	clntSockSize = sizeof(s->clntAddr);
+	printf("size....\n");
+	s->other_clnt_sock = accept(s->server_sock, (struct sockaddr *)&s->clntAddr, &clntSockSize);
+	if(s->other_clnt_sock == -1)
+		error_msg("accept() error", -1);
+	s->connectServer(inet_ntoa(s->clntAddr.sin_addr), s->clntAddr.sin_port);
+	s->server_open = true;
+	s->mtx.unlock();
 }
 
 
@@ -53,42 +76,9 @@ BeerSockStatus_t BeerSock::server_start(){
 #if DEBUG == 1
 //	const char* serverMessage = "Hello, Beer!";
 #endif
-	socklen_t clntSockSize;
 	server_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-
-	serverProc = fork();
-	if(serverProc == 0){
-		if(server_sock == -1)
-			error_msg("socket() error", -1);
-
-		if(bind(server_sock, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) == -1)
-			error_msg("bind() error", -1);
-
-		printf("listen()....\n");
-		if(listen(server_sock, 5) == -1)
-			error_msg("listen() error", -1);
-
-		printf("accrpt()....\n");
-		clntSockSize = sizeof(clntAddr);
-		other_clnt_sock = accept(server_sock, (struct sockaddr *)&clntAddr, &clntSockSize);
-		if(other_clnt_sock == -1)
-			error_msg("accept() error", -1);
-		this->connectServer(inet_ntoa(clntAddr.sin_addr), clntAddr.sin_port);
-		
-		while(1){
-			BEER_SOCK_FAILURE(read(this->other_clnt_sock, msg, 1024)){
-				msg[0] = '\0';
-			}
-		}
-		// exit(BEERSOCK_SUCCESS);
-#if DEBUG == 1
-//		write(other_clnt_sock, serverMessage, strlen(serverMessage));
-//		close(other_clnt_sock);
-//		close(server_sock);
-#endif
-	}
-	if(serverProc == -1)
-		return BEERSOCK_FAIL;
+	serverProc = std::thread(serverBinding, this);
+	serverProc.detach();
 	return BEERSOCK_SUCCESS;
 }
 
@@ -108,7 +98,6 @@ BeerSockStatus_t BeerSock::server_end(){
 	o(close(this->server_sock));
 	o(close(this->my_clnt_sock));
 	o(close(this->other_clnt_sock));
-	kill(serverProc, SIGINT);
 #undef o
 	// printf("end\n");
 	return BEERSOCK_SUCCESS;
@@ -149,10 +138,8 @@ BeerSockStatus_t BeerSock::writeServer(std::string msg) {
 	return writeServer(msg.c_str());
 }
 
-BeerSockStatus_t BeerSock::readClient(char** __argv){
-	if(strlen(*__argv) < BEERSOCK_MAX_BUF) 
-		return BEERSOCK_FAIL;
-	BEER_SOCK_FAILURE(read(this->my_clnt_sock, *__argv, BEERSOCK_MAX_BUF)){
+BeerSockStatus_t BeerSock::readClient(){
+	BEER_SOCK_FAILURE(read(this->other_clnt_sock, msg, BEERSOCK_MAX_BUF)){
 		return BEERSOCK_FAIL;
 	}
 	return BEERSOCK_SUCCESS;

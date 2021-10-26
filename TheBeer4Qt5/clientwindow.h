@@ -2,6 +2,7 @@
 #define CLIENTWINDOW_H
 
 #include <QMainWindow>
+#include <thread>
 #include "beer.h"
 
 QT_BEGIN_NAMESPACE
@@ -15,6 +16,8 @@ class ClientWindow : public QMainWindow
 public:
     ClientWindow(QWidget *parent = nullptr);
     ~ClientWindow();
+    Beer* beer;
+    Ui::ClientWindow *ui;
 
 private slots:
     void on_Server_Start_clicked();
@@ -26,9 +29,8 @@ private slots:
     void on_ConnectButton_clicked();
 
 private:
-    static constexpr char* my_ip = "10.80.163.172";
-    Ui::ClientWindow *ui;
-    Beer* beer;
+    static constexpr char* my_ip = "10.80.162.236";
+    std::thread readProc;
 
 };
 #endif // CLIENTWINDOW_H
