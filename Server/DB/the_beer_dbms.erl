@@ -2,8 +2,8 @@
 -author("Shin Hyun Kyu").
 -export([dbms_init/0,
         create_database/1,
-        create_table/3,
-        get_All_Type_List/1]).
+        create_table/4,
+        insert_into/3]).
 
 -type key() :: atom() | string() | binary().
 
@@ -28,10 +28,10 @@ create_table(DatabaseName, TableName, AttributeName, TypeName) ->
     Attribute = get_All_Value_List(AttributeName),
     Type = get_All_Type_List(TypeName),
     TableHash = get_sha256(Attribute),
-    io:format(TableHashIO, "~s", [TableHash]),
+    io:format(TableHashIO, "~s", [Table]),
     file:close(TableHashIO),
     {ok, TableSetIO} = file:open("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/TableSetting", [write]),
-    io:format(TableSetIO, "~s", Type),
+    io:format(TableSetIO, "~s", [Type]),
     file:close(TableSetIO),
     {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash", [write]),
     file:close(ObjectIO).
@@ -43,9 +43,11 @@ select_table(DatabaseName, TableName, Attribute) ->
     {ok, Data} = file:read_file("./The_Beer_Database/" ++ Database ++ "/TableHash"),
     ReadBinary = binary:split(Data, <<"#">>).
 
+-spec insert_into(key(), key(), any()) -> ok | error.
 insert_into(DatabaseName, TableName, Value) ->
     TableObject = get_All_Value_List(Value),
     {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(TableName) ++ "/" ++ get_sha256(TableObject)),
+    io:format(ObjectIO, "~s~n", get_sha256(TableObject)),
     file:close(ObjectIO).
 
 get_sha256(Str) ->
@@ -55,7 +57,8 @@ get_sha256(Str) ->
 make_table_dir(DatabaseName, TableName) ->
     Table = get_sha256(DatabaseName ++ TableName),
     Database = get_sha256(DatabaseName),
-    make_dir("./The_Beer_Database/" ++ Database ++ "/" ++ Table).
+    make_dir("./The_Beer_Database/" ++ Database ++ "/" ++ Table),
+    Table.
 
 make_dir(Dir) -> 
     case file:make_dir(Dir) of
@@ -83,4 +86,14 @@ get_All_Type_List([Head|Tail]) ->
     atom_to_list(Head) ++ "#" ++ get_All_Type_List(Tail);
 
 get_All_Type_List([]) ->
+    "".
+
+load_All_File(FilePath) ->
+    {ok, FileData} = file:read_file(FilePath),
+    .
+
+concat_All_Binary([HeadBinary | TailBinary]) ->
+    binary_to_list(HeadBinary) ++ concat_All_Binary(TailBinary);
+
+concat_All_Binary([]) ->
     "".

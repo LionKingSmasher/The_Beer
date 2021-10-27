@@ -5,7 +5,8 @@
 -import(the_beer_dbms, [
             dbms_init/0,
             create_database/1,
-            create_table/3
+            create_table/4,
+            insert_into/3
         ]).
 
 -include("ip.hrl").
@@ -30,6 +31,10 @@ handler(ASocket) ->
             gen_tcp:close(ASocket);
         {tcp, ASocket, <<"get ip id=", X/binary>>} ->
             gen_tcp:close(ASocket);
+        {tcp, ASocket, <<"Register My IP">>} ->
+            {ok, {IP, _}} = inet:peer(ASocket),
+            the_beer_dbms:inser_into("TheBeer", "NodeList", [inet:ntoa(IP)]),
+            handler(ASocket).
         {tcp, ASocket, BinaryMSG} ->
             gen_tcp:send(ASocket, "Your MSG: " ++ BinaryMSG),
             handler(ASocket)
