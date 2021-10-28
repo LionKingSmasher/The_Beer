@@ -3,7 +3,8 @@
 -export([dbms_init/0,
         create_database/1,
         create_table/4,
-        insert_into/3]).
+        insert_into/3,
+        select_table/3]).
 
 -type key() :: atom() | string() | binary().
 
@@ -31,7 +32,7 @@ create_table(DatabaseName, TableName, AttributeName, TypeName) ->
     io:format(TableHashIO, "~s", [Table]),
     file:close(TableHashIO),
     {ok, TableSetIO} = file:open("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/TableSetting", [write]),
-    io:format(TableSetIO, "~s", [Type]),
+    io:format(TableSetIO, "~s~s~n", [Attribute, Type]),
     file:close(TableSetIO),
     {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash", [write]),
     file:close(ObjectIO).
@@ -40,15 +41,18 @@ create_table(DatabaseName, TableName, AttributeName, TypeName) ->
 select_table(DatabaseName, TableName, Attribute) ->
     Table = get_sha256(DatabaseName ++ TableName),
     Database = get_sha256(DatabaseName),
-    {ok, Data} = file:read_file("./The_Beer_Database/" ++ Database ++ "/TableHash"),
-    ReadBinary = binary:split(Data, <<"#">>).
+    load_All_File("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/TableSetting").
 
--spec insert_into(key(), key(), any()) -> ok | error.
+-spec insert_into(key(), key(), [any()]) -> ok | error.
 insert_into(DatabaseName, TableName, Value) ->
     TableObject = get_All_Value_List(Value),
-    {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(TableName) ++ "/" ++ get_sha256(TableObject)),
-    io:format(ObjectIO, "~s~n", get_sha256(TableObject)),
-    file:close(ObjectIO).
+%   io:format("~s~n", ["./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName ++ TableName) ++ "/" ++ get_sha256(TableObject)]),
+    {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName++TableName) ++ "/" ++ get_sha256(TableObject), [write]),
+    io:format(ObjectIO, "~s~n", [TableObject]),
+    file:close(ObjectIO),
+    {ok, ObjectHashIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName++TableName) ++ "/ObjectHash", [write]),
+    io:format(ObjectHashIO, "~s~n", get_sha256(TableObject)),
+    file:close(ObjectHashIO).
 
 get_sha256(Str) ->
     <<Integer:256>> = crypto:hash(sha256, Str),
@@ -79,7 +83,7 @@ get_All_Value_List([Head|Tail]) ->
     "#" ++ Val ++ get_All_Value_List(Tail);
 
 get_All_Value_List([]) ->
-    "".
+    "#".
 
 -spec get_All_Type_List([dbms_type()]) -> string().
 get_All_Type_List([Head|Tail]) ->
@@ -90,10 +94,34 @@ get_All_Type_List([]) ->
 
 load_All_File(FilePath) ->
     {ok, FileData} = file:read_file(FilePath),
-    .
+    binary:split(FileData, <<"#">>).
+
+load_All_Hash(FilePath) ->
+    {ok, FileData} = file:read_file(FilePath),
+    binary:split(FileData, <<"\n">>).
 
 concat_All_Binary([HeadBinary | TailBinary]) ->
     binary_to_list(HeadBinary) ++ concat_All_Binary(TailBinary);
 
 concat_All_Binary([]) ->
     "".
+
+read_value([Head|Tail], Num, Count) ->
+    if
+        Num == Count ->
+            Head;
+        true ->
+            read_value(Tail, Num, Count + 1)
+    end.
+
+read_value_by_file(FileIO, Num) ->
+    read_value(FileIO, Num, 1).
+
+check_all_file_in_list(TableDir, [HeadVal | TailVal]) ->
+    FileData = load_All_Hash(TableDir ++ HeadDir),
+    if
+        TailVal == [] ->
+            
+        TailDir == [] ->
+            {error, no_file}.
+    end,

@@ -18,6 +18,8 @@ public:
     ~ClientWindow();
     Beer* beer;
     Ui::ClientWindow *ui;
+    int nodeServer;
+    struct sockaddr_in nodeServerAddr;
 
 private slots:
     void on_Server_Start_clicked();

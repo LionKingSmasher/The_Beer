@@ -20,6 +20,20 @@ ClientWindow::~ClientWindow()
     delete ui;
 }
 
+static void connectNodeServer(const char* ip, uint16_t port, ClientWindow* ui){
+    ui->nodeServer = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    ui->nodeServerAddr.sin_addr.s_addr = inet_addr(ip);
+    ui->nodeServerAddr.sin_port = htons(port);
+    ui->nodeServerAddr.sin_family = AF_INET;
+    if(connect(ui->nodeServer, (struct sockaddr*)&ui->nodeServerAddr, sizeof(ui->nodeServerAddr)) == -1){
+        printf("Connect Error...\n");
+    }
+}
+
+static void closeServer(int fd){
+    close(fd);
+}
+
  static void MessageReader(ClientWindow* win){
     memset(&win->beer->msg, 0, 256);
 //    printf("Test Message");
@@ -54,10 +68,21 @@ void ClientWindow::on_Server_End_Button_clicked()
 
 void ClientWindow::on_Server_Start_Button_clicked()
 {
+    char msg[256];
     ui->LogBox->setPlainText(ui->LogBox->toPlainText() + "Server Start!\n");
     beer->server_start();
     readProc = std::thread(MessageReader, this);
     readProc.detach();
+    connectNodeServer("10.80.162.236", 10000, this);
+
+    write(nodeServer, "Test", 4);
+    read(nodeServer, &msg, 256);
+    printf("Server: %s\n", msg);
+    write(nodeServer, "register name=IamGod", 20);
+    read(nodeServer, &msg, 256);
+    write(nodeServer, "done", 4);
+    closeServer(nodeServer);
+
     while(1){
         if(strlen(beer->msg) > 0){
             printf("Message %s\n", beer->msg);
@@ -66,6 +91,7 @@ void ClientWindow::on_Server_Start_Button_clicked()
         }
         QApplication::processEvents();
     }
+
 
 //    readProc = fork();
 //    if(readProc == 0){

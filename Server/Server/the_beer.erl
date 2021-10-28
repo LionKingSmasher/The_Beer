@@ -6,14 +6,16 @@
             dbms_init/0,
             create_database/1,
             create_table/4,
-            insert_into/3
+            insert_into/3,
+            select_table/3
         ]).
 
 -include("ip.hrl").
 
 start_server() -> 
+    init_database(),
     Pid = spawn_link(fun() ->
-        {ok, LSocket} = gen_tcp:listen(?PORT, [binary, {active, false}, {ip, {10, 80, 163, 172}}]),
+        {ok, LSocket} = gen_tcp:listen(?PORT, [binary, {active, false}, {ip, {10, 80, 162, 236}}]),
         spawn(fun() -> acceptState(LSocket) end),
         timer:sleep(infinity)
         end),
@@ -30,12 +32,20 @@ handler(ASocket) ->
         {tcp, ASocket, <<"done">>} ->
             gen_tcp:close(ASocket);
         {tcp, ASocket, <<"get ip id=", X/binary>>} ->
-            gen_tcp:close(ASocket);
-        {tcp, ASocket, <<"Register My IP">>} ->
-            {ok, {IP, _}} = inet:peer(ASocket),
-            the_beer_dbms:inser_into("TheBeer", "NodeList", [inet:ntoa(IP)]),
-            handler(ASocket).
+            % the_beer_dbms:select_table("TheBeer", "NodeList", )
+            handler(ASocket);
+        {tcp, ASocket, <<"register name=", X/binary>>} ->
+            {ok, {Ip, Port}} = inet:peername(ASocket),
+            the_beer_dbms:insert_into("TheBeer", "NodeList", [binary_to_list(X), inet:ntoa(Ip), integer_to_list(Port)]),
+            handler(ASocket);
         {tcp, ASocket, BinaryMSG} ->
+            {ok, {Ip, Port}} = inet:peername(ASocket),
+            io:format("~s : ~s~n", [inet:ntoa(Ip), BinaryMSG]),
             gen_tcp:send(ASocket, "Your MSG: " ++ BinaryMSG),
             handler(ASocket)
     end.
+
+init_database() ->
+    the_beer_dbms:create_database("TheBeer"),
+    the_beer_dbms:create_table("TheBeer", "NodeList", ['Name', 'IP', 'PORT'], ['String', 'String']),
+    io:format("The Beer Database Initialized~n").
