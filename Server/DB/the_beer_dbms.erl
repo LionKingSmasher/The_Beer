@@ -37,11 +37,46 @@ create_table(DatabaseName, TableName, AttributeName, TypeName) ->
     {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash", [write]),
     file:close(ObjectIO).
 
+get_arr_value_index([Head | Tail], CompareAtom, Index) -> 
+    if 
+        Head == CompareAtom ->
+            Index;
+        Tail == [] ->
+            {error, not_found_index};
+        true -> 
+            get_arr_value_index(Tail, CompareAtom, Index + 1)
+    end.
+
+get_arr_value_index(Arr, CompareAtom) ->
+    get_arr_value_index(Arr, CompareAtom, 1).
+
+get_file_object_index(Path, [HeadOH | TailOH]) ->
+    io:format("~s~n", [binary_to_list(HeadOH)]),
+    {ok, ReadBinary} = file:read_file(Path ++ "/" ++ binary_to_list(HeadOH)),
+    io:format("Binary: ~s~n", [binary_to_list(ReadBinary)]),
+    if
+        TailOH == [<<>>] ->
+            io:format("Empty!!~n"),
+            io:format("done!~n");
+        true ->
+            io:format("Not Empty!~n"),
+            get_file_object_index(Path, TailOH)
+    end.
+
 -spec select_table(key(), key(), [atom()]) -> ok | error.
-select_table(DatabaseName, TableName, Attribute) ->
+select_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
     Table = get_sha256(DatabaseName ++ TableName),
     Database = get_sha256(DatabaseName),
-    load_All_File("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/TableSetting").
+    {ok, AllObjectBinary} = file:read_file("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash"),
+    io:format("~s~n", [binary_to_list(AllObjectBinary)]),
+    AllObject = binary:split(AllObjectBinary, <<"\n">>),
+    get_file_object_index("./The_Beer_Database/" ++ Database ++ "/" ++ Table, AllObject).
+
+% -spec select_table(key(), key(), [atom()]) -> ok | error.
+% select_table(DatabaseName, TableName, Attribute) ->
+%     Table = get_sha256(DatabaseName ++ TableName),
+%     Database = get_sha256(DatabaseName),
+%     load_All_File("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/TableSetting").
 
 -spec insert_into(key(), key(), [any()]) -> ok | error.
 insert_into(DatabaseName, TableName, Value) ->
@@ -106,22 +141,16 @@ concat_All_Binary([HeadBinary | TailBinary]) ->
 concat_All_Binary([]) ->
     "".
 
-read_value([Head|Tail], Num, Count) ->
+-spec read_value_list([key()], integer(), integer()) -> key() | {error, atom()}.
+read_value_list([Head|Tail], Num, Count) ->
     if
         Num == Count ->
             Head;
+        Tail == [] ->
+            {error, value_not_found};
         true ->
-            read_value(Tail, Num, Count + 1)
+            read_value_list(Tail, Num, Count + 1)
     end.
 
 read_value_by_file(FileIO, Num) ->
-    read_value(FileIO, Num, 1).
-
-check_all_file_in_list(TableDir, [HeadVal | TailVal]) ->
-    FileData = load_All_Hash(TableDir ++ HeadDir),
-    if
-        TailVal == [] ->
-            
-        TailDir == [] ->
-            {error, no_file}.
-    end,
+    read_value_list(FileIO, Num, 1).

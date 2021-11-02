@@ -74,14 +74,16 @@ void ClientWindow::on_Server_Start_Button_clicked()
     readProc = std::thread(MessageReader, this);
     readProc.detach();
     connectNodeServer("10.80.162.236", 10000, this);
+    std::string command = NodeServerCommand[1] + ui->userName->text().toStdString();
+    write(nodeServer, command.c_str(), command.size()); // regist my ip & username
 
-    write(nodeServer, "Test", 4);
-    read(nodeServer, &msg, 256);
-    printf("Server: %s\n", msg);
-    write(nodeServer, "register name=IamGod", 20);
-    read(nodeServer, &msg, 256);
-    write(nodeServer, "done", 4);
-    closeServer(nodeServer);
+//    write(nodeServer, "Test", 4);
+//    read(nodeServer, &msg, 256);
+//    printf("Server: %s\n", msg);
+//    write(nodeServer, "register name=IamGod", 20);
+//    read(nodeServer, &msg, 256);
+//    write(nodeServer, "done", 4);
+//    closeServer(nodeServer);
 
     while(1){
         if(strlen(beer->msg) > 0){

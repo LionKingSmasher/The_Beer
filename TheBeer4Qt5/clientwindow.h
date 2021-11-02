@@ -9,6 +9,11 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class ClientWindow; }
 QT_END_NAMESPACE
 
+const std::string NodeServerCommand[2] = {
+    "register name=", // register command
+    "get ip id=",     // get ip command
+};
+
 class ClientWindow : public QMainWindow
 {
     Q_OBJECT

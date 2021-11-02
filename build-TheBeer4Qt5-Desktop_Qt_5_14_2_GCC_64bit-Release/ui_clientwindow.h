@@ -36,6 +36,8 @@ public:
     QPushButton *Server_Start_Button;
     QPushButton *Server_End_Button;
     QPushButton *ConnectButton;
+    QLineEdit *userName;
+    QLabel *label_3;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -51,16 +53,16 @@ public:
         IPNodeList->setGeometry(QRect(830, 10, 331, 541));
         PortBOX = new QLineEdit(centralwidget);
         PortBOX->setObjectName(QString::fromUtf8("PortBOX"));
-        PortBOX->setGeometry(QRect(60, 550, 431, 25));
+        PortBOX->setGeometry(QRect(60, 560, 431, 25));
         IPBox = new QLineEdit(centralwidget);
         IPBox->setObjectName(QString::fromUtf8("IPBox"));
-        IPBox->setGeometry(QRect(60, 510, 431, 25));
+        IPBox->setGeometry(QRect(60, 520, 431, 25));
         label = new QLabel(centralwidget);
         label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(10, 510, 67, 17));
+        label->setGeometry(QRect(10, 520, 67, 17));
         label_2 = new QLabel(centralwidget);
         label_2->setObjectName(QString::fromUtf8("label_2"));
-        label_2->setGeometry(QRect(10, 550, 67, 17));
+        label_2->setGeometry(QRect(10, 560, 67, 17));
         LogBox = new QPlainTextEdit(centralwidget);
         LogBox->setObjectName(QString::fromUtf8("LogBox"));
         LogBox->setGeometry(QRect(10, 10, 811, 461));
@@ -73,6 +75,12 @@ public:
         ConnectButton = new QPushButton(centralwidget);
         ConnectButton->setObjectName(QString::fromUtf8("ConnectButton"));
         ConnectButton->setGeometry(QRect(510, 510, 151, 61));
+        userName = new QLineEdit(centralwidget);
+        userName->setObjectName(QString::fromUtf8("userName"));
+        userName->setGeometry(QRect(60, 480, 431, 25));
+        label_3 = new QLabel(centralwidget);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setGeometry(QRect(10, 480, 67, 17));
         ClientWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(ClientWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
@@ -95,6 +103,7 @@ public:
         Server_Start_Button->setText(QCoreApplication::translate("ClientWindow", "Start", nullptr));
         Server_End_Button->setText(QCoreApplication::translate("ClientWindow", "End", nullptr));
         ConnectButton->setText(QCoreApplication::translate("ClientWindow", "Connect", nullptr));
+        label_3->setText(QCoreApplication::translate("ClientWindow", "Name", nullptr));
     } // retranslateUi
 
 };

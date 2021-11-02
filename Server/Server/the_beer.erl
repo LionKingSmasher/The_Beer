@@ -38,7 +38,7 @@ handler(ASocket) ->
             {ok, {Ip, Port}} = inet:peername(ASocket),
             the_beer_dbms:insert_into("TheBeer", "NodeList", [binary_to_list(X), inet:ntoa(Ip), integer_to_list(Port)]),
             handler(ASocket);
-        {tcp, ASocket, BinaryMSG} ->
+        {tcp, ASocket, BinaryMSG} -> % Test Section
             {ok, {Ip, Port}} = inet:peername(ASocket),
             io:format("~s : ~s~n", [inet:ntoa(Ip), BinaryMSG]),
             gen_tcp:send(ASocket, "Your MSG: " ++ BinaryMSG),
