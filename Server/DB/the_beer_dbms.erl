@@ -56,12 +56,15 @@ get_file_object_index(Path, [HeadOH | TailOH]) ->
     io:format("Binary: ~s~n", [binary_to_list(ReadBinary)]),
     if
         TailOH == [<<>>] ->
-            io:format("Empty!!~n"),
-            io:format("done!~n");
+            % io:format("Empty!!~n"),
+            [];
         true ->
-            io:format("Not Empty!~n"),
-            get_file_object_index(Path, TailOH)
+            % io:format("Not Empty!~n"),
+            [HeadOH] ++ get_file_object_index(Path, TailOH)
     end.
+
+get_binary_by_value(BinaryVal) ->
+    .
 
 -spec select_table(key(), key(), [atom()]) -> ok | error.
 select_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
@@ -70,7 +73,7 @@ select_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
     {ok, AllObjectBinary} = file:read_file("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash"),
     io:format("~s~n", [binary_to_list(AllObjectBinary)]),
     AllObject = binary:split(AllObjectBinary, <<"\n">>),
-    get_file_object_index("./The_Beer_Database/" ++ Database ++ "/" ++ Table, AllObject).
+    AllValue = get_file_object_index("./The_Beer_Database/" ++ Database ++ "/" ++ Table, AllObject).
 
 % -spec select_table(key(), key(), [atom()]) -> ok | error.
 % select_table(DatabaseName, TableName, Attribute) ->

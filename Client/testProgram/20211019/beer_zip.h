@@ -19,6 +19,12 @@ struct LZ77_t {
 	u8 data;  // data
 };
 
+struct BlockChain_t{
+	char my_hash[256];   // my hash
+	char message[512];   // data or message
+	char next_hash[256]; // next chain hash 
+};
+
 struct LZ77_Buffer_t {
 	u8 buffer[WIN_BUF + LOOK_BUF];
 	// 0x00 - WIN_BUF : Window buff
