@@ -47,5 +47,5 @@ handler(ASocket) ->
 
 init_database() ->
     the_beer_dbms:create_database("TheBeer"),
-    the_beer_dbms:create_table("TheBeer", "NodeList", ['Name', 'IP', 'PORT'], ['String', 'String']),
+    the_beer_dbms:create_table("TheBeer", "NodeList", ['Name', 'IP', 'PORT'], ['String', 'String', 'Int']),
     io:format("The Beer Database Initialized~n").

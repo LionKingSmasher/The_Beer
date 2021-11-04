@@ -39,8 +39,8 @@ create_table(DatabaseName, TableName, AttributeName, TypeName) ->
 
 get_arr_value_index([Head | Tail], CompareAtom, Index) -> 
     if 
-        Head == CompareAtom ->
-            Index;
+        Index == CompareAtom ->
+            Head;
         Tail == [] ->
             {error, not_found_index};
         true -> 
@@ -51,29 +51,41 @@ get_arr_value_index(Arr, CompareAtom) ->
     get_arr_value_index(Arr, CompareAtom, 1).
 
 get_file_object_index(Path, [HeadOH | TailOH]) ->
-    io:format("~s~n", [binary_to_list(HeadOH)]),
+    % io:format("~s~n", [binary_to_list(HeadOH)]),
     {ok, ReadBinary} = file:read_file(Path ++ "/" ++ binary_to_list(HeadOH)),
-    io:format("Binary: ~s~n", [binary_to_list(ReadBinary)]),
-    if
-        TailOH == [<<>>] ->
-            % io:format("Empty!!~n"),
-            [];
-        true ->
-            % io:format("Not Empty!~n"),
-            [HeadOH] ++ get_file_object_index(Path, TailOH)
-    end.
+    % io:format("Binary: ~s~n", [binary_to_list(ReadBinary)]),
+    % io:format("Not Empty!~n"),
+    ReadBinaryFinal = binary:split(ReadBinary, <<"\n">>),
+    [get_arr_value_index(ReadBinaryFinal, 1)] ++ get_file_object_index(Path, TailOH);
+    % if
+    %     HeadOH == [] ->
+    %         % io:format("Empty!!~n"),
+    %         [];
+    %     true ->
+    %         {ok, ReadBinary} = file:read_file(Path ++ "/" ++ binary_to_list(HeadOH)),
+    %         io:format("Binary: ~s~n", [binary_to_list(ReadBinary)]),
+    %         % io:format("Not Empty!~n"),
+    %         [ReadBinary] ++ get_file_object_index(Path, TailOH)
+    % end.
 
-get_binary_by_value(BinaryVal) ->
-    .
+get_file_object_index(Path, []) ->
+    [].
+
+% get_binary_by_value(BinaryVal) ->
+%     .
+
+
 
 -spec select_table(key(), key(), [atom()]) -> ok | error.
 select_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
     Table = get_sha256(DatabaseName ++ TableName),
     Database = get_sha256(DatabaseName),
     {ok, AllObjectBinary} = file:read_file("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash"),
-    io:format("~s~n", [binary_to_list(AllObjectBinary)]),
+    % io:format("~s~n", [binary_to_list(AllObjectBinary)]),
     AllObject = binary:split(AllObjectBinary, <<"\n">>),
     AllValue = get_file_object_index("./The_Beer_Database/" ++ Database ++ "/" ++ Table, AllObject).
+    
+    % get_arr_value_index(AllValue, 1).
 
 % -spec select_table(key(), key(), [atom()]) -> ok | error.
 % select_table(DatabaseName, TableName, Attribute) ->
@@ -86,10 +98,10 @@ insert_into(DatabaseName, TableName, Value) ->
     TableObject = get_All_Value_List(Value),
 %   io:format("~s~n", ["./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName ++ TableName) ++ "/" ++ get_sha256(TableObject)]),
     {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName++TableName) ++ "/" ++ get_sha256(TableObject), [write]),
-    io:format(ObjectIO, "~s~n", [TableObject]),
+    io:format(ObjectIO, "~s", [TableObject]),
     file:close(ObjectIO),
     {ok, ObjectHashIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName++TableName) ++ "/ObjectHash", [write]),
-    io:format(ObjectHashIO, "~s~n", get_sha256(TableObject)),
+    io:format(ObjectHashIO, "~s", get_sha256(TableObject)),
     file:close(ObjectHashIO).
 
 get_sha256(Str) ->
