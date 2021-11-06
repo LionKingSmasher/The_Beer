@@ -29,6 +29,7 @@ public:
     Beer* beer;
     Ui::ClientWindow *ui;
     int nodeServer;
+    pthread_t readProcHandle;
     struct sockaddr_in nodeServerAddr;
 
 private slots:

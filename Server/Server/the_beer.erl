@@ -30,6 +30,8 @@ handler(ASocket) ->
     inet:setopts(ASocket, [{active, once}]),
     receive
         {tcp, ASocket, <<"done">>} ->
+            {ok, {Ip, _}} = inet:peername(ASocket),
+            io:format("~s : exit", [inet:ntoa(Ip)]),
             gen_tcp:close(ASocket);
         {tcp, ASocket, <<"get ip id=", X/binary>>} ->
             LoadData = the_beer_dbms:select_table("TheBeer", "NodeList", [1]),

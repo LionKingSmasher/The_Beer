@@ -14,16 +14,6 @@
    <string>ClientWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QListView" name="IPNodeList">
-    <property name="geometry">
-     <rect>
-      <x>830</x>
-      <y>10</y>
-      <width>331</width>
-      <height>621</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="PortBOX">
     <property name="geometry">
      <rect>
@@ -151,6 +141,26 @@
       <height>25</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QTableWidget" name="IPList">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>20</y>
+      <width>331</width>
+      <height>591</height>
+     </rect>
+    </property>
+    <column>
+     <property name="text">
+      <string>NAME</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>IP</string>
+     </property>
+    </column>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

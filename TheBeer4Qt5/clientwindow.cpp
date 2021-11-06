@@ -2,6 +2,7 @@
 #include "ui_clientwindow.h"
 #include <sys/signal.h>
 
+#include <QStringList>
 #include <QMessageBox>
 
 #define BEER_FAILURE(X) if (X == BEERSOCK_FAIL)
@@ -12,6 +13,11 @@ ClientWindow::ClientWindow(QWidget *parent)
     , beer(new Beer(this->my_ip, 9999))
 {
     ui->setupUi(this);
+    QStringList Header;
+    Header << "Name" << "IP";
+    ui->IPList->setColumnCount(2);
+    ui->IPList->setHorizontalHeaderLabels(Header);
+    ui->IPList->horizontalHeader()->setStretchLastSection(true);
 }
 
 ClientWindow::~ClientWindow()
@@ -71,6 +77,7 @@ void ClientWindow::on_Server_End_Button_clicked()
     closeNodeServer(this);
     beer->server_end();
     beer->server_open = false;
+    pthread_cancel(this->readProcHandle);
 }
 
 void ClientWindow::on_Server_Start_Button_clicked()
@@ -79,9 +86,10 @@ void ClientWindow::on_Server_Start_Button_clicked()
     ui->LogBox->setPlainText(ui->LogBox->toPlainText() + "Server Start!\n");
     beer->server_start();
     readProc = std::thread(MessageReader, this);
+    readProcHandle = readProc.native_handle();
     readProc.detach();
     connectNodeServer("10.80.162.236", 10000, this);
-    std::string command = NodeServerCommand[0] + ui->userName->text().toStdString() + NodeBackCommand[0] + ui->PortBOX->text().toStdString();
+    std::string command = NodeServerCommand[0] + ui->userName->text().toStdString();
     write(nodeServer, command.c_str(), command.size()); // regist my ip & username
 
 //    write(nodeServer, "Test", 4);
