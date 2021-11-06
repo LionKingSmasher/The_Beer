@@ -32,11 +32,13 @@ handler(ASocket) ->
         {tcp, ASocket, <<"done">>} ->
             gen_tcp:close(ASocket);
         {tcp, ASocket, <<"get ip id=", X/binary>>} ->
-            % the_beer_dbms:select_table("TheBeer", "NodeList", )
+            LoadData = the_beer_dbms:select_table("TheBeer", "NodeList", [1]),
+            io:format("~s~n", [binary_to_list(LoadData)]),
             handler(ASocket);
-        {tcp, ASocket, <<"register name=", X/binary>>} ->
+        {tcp, ASocket, <<"register name=", Name/binary>>} ->
             {ok, {Ip, Port}} = inet:peername(ASocket),
-            the_beer_dbms:insert_into("TheBeer", "NodeList", [binary_to_list(X), inet:ntoa(Ip), integer_to_list(Port)]),
+            the_beer_dbms:insert_into("TheBeer", "NodeList", [binary_to_list(Name), inet:ntoa(Ip), integer_to_list(Port)]),
+            io:format("~s : ~s ~n", [binary_to_list(Name), inet:ntoa(Ip)]),
             handler(ASocket);
         {tcp, ASocket, BinaryMSG} -> % Test Section
             {ok, {Ip, Port}} = inet:peername(ASocket),
@@ -47,5 +49,5 @@ handler(ASocket) ->
 
 init_database() ->
     the_beer_dbms:create_database("TheBeer"),
-    the_beer_dbms:create_table("TheBeer", "NodeList", ['Name', 'IP', 'PORT'], ['String', 'String', 'Int']),
+    the_beer_dbms:create_table("TheBeer", "NodeList", ['Name', 'IP'], ['String', 'String']),
     io:format("The Beer Database Initialized~n").

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1177</width>
-    <height>632</height>
+    <height>675</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,15 +20,15 @@
       <x>830</x>
       <y>10</y>
       <width>331</width>
-      <height>541</height>
+      <height>621</height>
      </rect>
     </property>
    </widget>
    <widget class="QLineEdit" name="PortBOX">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>560</y>
+      <x>70</x>
+      <y>600</y>
       <width>431</width>
       <height>25</height>
      </rect>
@@ -37,8 +37,8 @@
    <widget class="QLineEdit" name="IPBox">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>520</y>
+      <x>70</x>
+      <y>560</y>
       <width>431</width>
       <height>25</height>
      </rect>
@@ -47,8 +47,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>520</y>
+      <x>20</x>
+      <y>560</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -60,8 +60,8 @@
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>560</y>
+      <x>20</x>
+      <y>600</y>
       <width>67</width>
       <height>17</height>
      </rect>
@@ -84,35 +84,35 @@
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>510</y>
+      <y>520</y>
       <width>151</width>
-      <height>25</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>Start</string>
+     <string>Start Server</string>
     </property>
    </widget>
    <widget class="QPushButton" name="Server_End_Button">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>550</y>
+      <y>574</y>
       <width>151</width>
-      <height>25</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>End</string>
+     <string>End Server</string>
     </property>
    </widget>
    <widget class="QPushButton" name="ConnectButton">
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>510</y>
+      <y>520</y>
       <width>151</width>
-      <height>61</height>
+      <height>101</height>
      </rect>
     </property>
     <property name="text">
@@ -122,8 +122,8 @@
    <widget class="QLineEdit" name="userName">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>480</y>
+      <x>70</x>
+      <y>520</y>
       <width>431</width>
       <height>25</height>
      </rect>
@@ -132,14 +132,24 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>480</y>
+      <x>20</x>
+      <y>520</y>
       <width>67</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
      <string>Name</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>480</y>
+      <width>801</width>
+      <height>25</height>
+     </rect>
     </property>
    </widget>
   </widget>

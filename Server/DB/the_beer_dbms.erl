@@ -51,22 +51,23 @@ get_arr_value_index(Arr, CompareAtom) ->
     get_arr_value_index(Arr, CompareAtom, 1).
 
 get_file_object_index(Path, [HeadOH | TailOH]) ->
-    % io:format("~s~n", [binary_to_list(HeadOH)]),
-    {ok, ReadBinary} = file:read_file(Path ++ "/" ++ binary_to_list(HeadOH)),
+    io:format("~s~n", [Path ++ "/" ++ binary_to_list(HeadOH)]),
+    % {ok, ReadBinary} = file:read_file(Path ++ "/" ++ binary_to_list(HeadOH)),
     % io:format("Binary: ~s~n", [binary_to_list(ReadBinary)]),
     % io:format("Not Empty!~n"),
-    ReadBinaryFinal = binary:split(ReadBinary, <<"\n">>),
-    [get_arr_value_index(ReadBinaryFinal, 1)] ++ get_file_object_index(Path, TailOH);
-    % if
-    %     HeadOH == [] ->
-    %         % io:format("Empty!!~n"),
-    %         [];
-    %     true ->
-    %         {ok, ReadBinary} = file:read_file(Path ++ "/" ++ binary_to_list(HeadOH)),
-    %         io:format("Binary: ~s~n", [binary_to_list(ReadBinary)]),
-    %         % io:format("Not Empty!~n"),
-    %         [ReadBinary] ++ get_file_object_index(Path, TailOH)
-    % end.
+    % ReadBinaryFinal = binary:split(ReadBinary, <<"\n">>);
+    % [get_arr_value_index(ReadBinaryFinal, 1)] ++ get_file_object_index(Path, TailOH);
+    if
+        TailOH == [<<>>] ->
+            % io:format("Empty!!~n"),
+            [];
+        true ->
+            {ok, ReadBinary} = file:read_file(Path ++ "/" ++ binary_to_list(HeadOH)),
+            % io:format("Binary: ~s~n", [binary_to_list(ReadBinary)]),
+            % io:format("Not Empty!~n"),
+            ReadBinaryFinal = binary:split(ReadBinary, <<"\n">>),
+            [get_arr_value_index(ReadBinaryFinal, 1)] ++ get_file_object_index(Path, TailOH)
+    end;
 
 get_file_object_index(Path, []) ->
     [].
@@ -84,7 +85,6 @@ select_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
     % io:format("~s~n", [binary_to_list(AllObjectBinary)]),
     AllObject = binary:split(AllObjectBinary, <<"\n">>),
     AllValue = get_file_object_index("./The_Beer_Database/" ++ Database ++ "/" ++ Table, AllObject).
-    
     % get_arr_value_index(AllValue, 1).
 
 % -spec select_table(key(), key(), [atom()]) -> ok | error.

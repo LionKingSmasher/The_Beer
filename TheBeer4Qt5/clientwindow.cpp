@@ -34,6 +34,12 @@ static void closeServer(int fd){
     close(fd);
 }
 
+static void closeNodeServer(ClientWindow* ui){
+    std::string doneCommand = NodeServerCommand[2]; // done
+    write(ui->nodeServer, doneCommand.c_str(), doneCommand.size());
+    closeServer(ui->nodeServer);
+}
+
  static void MessageReader(ClientWindow* win){
     memset(&win->beer->msg, 0, 256);
 //    printf("Test Message");
@@ -62,6 +68,7 @@ void ClientWindow::on_Server_End_Button_clicked()
     else{
         ui->LogBox->setPlainText(ui->LogBox->toPlainText() + "False!\n");
     }
+    closeNodeServer(this);
     beer->server_end();
     beer->server_open = false;
 }
@@ -74,7 +81,7 @@ void ClientWindow::on_Server_Start_Button_clicked()
     readProc = std::thread(MessageReader, this);
     readProc.detach();
     connectNodeServer("10.80.162.236", 10000, this);
-    std::string command = NodeServerCommand[1] + ui->userName->text().toStdString();
+    std::string command = NodeServerCommand[0] + ui->userName->text().toStdString() + NodeBackCommand[0] + ui->PortBOX->text().toStdString();
     write(nodeServer, command.c_str(), command.size()); // regist my ip & username
 
 //    write(nodeServer, "Test", 4);
