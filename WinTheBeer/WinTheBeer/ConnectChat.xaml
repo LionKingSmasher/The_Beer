@@ -1,0 +1,15 @@
+﻿<Window x:Class="WinTheBeer.Window1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WinTheBeer"
+        mc:Ignorable="d"
+        Title="Window1" Height="300" Width="200">
+    <Grid Background="#FFB9AC3A">
+        <Label Content="The Beer Login!" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" FontSize="16" FontFamily="Elephant"/>
+        <Label Content="Username" HorizontalAlignment="Left" Margin="67,71,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="UserNameBox" HorizontalAlignment="Left" Height="23" Margin="39,102,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="Connect_Server" Content="Connect To Server" HorizontalAlignment="Left" Margin="39,180,0,0" VerticalAlignment="Top" Width="120" Click="Connect_Server_Click"/>
+    </Grid>
+</Window>
