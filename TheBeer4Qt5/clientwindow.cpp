@@ -88,7 +88,7 @@ void ClientWindow::on_Server_Start_Button_clicked()
     readProc = std::thread(MessageReader, this);
     readProcHandle = readProc.native_handle();
     readProc.detach();
-    connectNodeServer("10.80.162.236", 10000, this);
+    connectNodeServer(node_server_ip, 10000, this);
     std::string command = NodeServerCommand[0] + ui->userName->text().toStdString();
     write(nodeServer, command.c_str(), command.size()); // regist my ip & username
 

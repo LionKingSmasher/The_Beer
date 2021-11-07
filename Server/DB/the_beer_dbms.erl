@@ -4,7 +4,8 @@
         create_database/1,
         create_table/4,
         insert_into/3,
-        select_table/3]).
+        select_table/3,
+	delete_table/3]).
 
 -type key() :: atom() | string() | binary().
 
@@ -93,15 +94,27 @@ select_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
 %     Database = get_sha256(DatabaseName),
 %     load_All_File("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/TableSetting").
 
+delete_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
+    Table = get_sha256(DatabaseName ++ TableName),
+    Database = get_sha256(DatabaseName),
+    {ok, AllObjectBinary} = file:read_file("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash"),
+    AllObject = binary:split(AllObjectBinary, <<"\n">>),
+    .
+
 -spec insert_into(key(), key(), [any()]) -> ok | error.
 insert_into(DatabaseName, TableName, Value) ->
     TableObject = get_All_Value_List(Value),
 %   io:format("~s~n", ["./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName ++ TableName) ++ "/" ++ get_sha256(TableObject)]),
+%   ExistDataArr = binary:split(ExistFileData, <<"\n">>),
     {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName++TableName) ++ "/" ++ get_sha256(TableObject), [write]),
+%   write_data_in_file(ObjectIO, ExistDataArr, [TableObject
     io:format(ObjectIO, "~s", [TableObject]),
     file:close(ObjectIO),
+    {ok, ExistData} = file:read_file("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName ++ TableName) ++ "/ObjectHash"),
+    ExistDataArr = binary:split(ExistData, <<"\n">>),
     {ok, ObjectHashIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName++TableName) ++ "/ObjectHash", [write]),
-    io:format(ObjectHashIO, "~s", get_sha256(TableObject)),
+    write_data_in_file(ObjectHashIO, ExistDataArr, get_sha256(TableObject)),
+%   io:format(ObjectHashIO, "~s", [get_sha256(TableObject)]),
     file:close(ObjectHashIO).
 
 get_sha256(Str) ->
@@ -169,3 +182,10 @@ read_value_list([Head|Tail], Num, Count) ->
 
 read_value_by_file(FileIO, Num) ->
     read_value_list(FileIO, Num, 1).
+
+write_data_in_file(FileIO, [ExistData | OtherArr], NewData) ->
+    io:format("~s~n", [binary_to_list(ExistData)]),
+    write_data_in_file(FileIO, OtherArr, NewData);
+
+write_data_in_file(FileIO, [], NewData) ->
+    io:format("~s", [NewData]).

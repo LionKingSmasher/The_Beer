@@ -15,7 +15,7 @@
 start_server() -> 
     init_database(),
     Pid = spawn_link(fun() ->
-        {ok, LSocket} = gen_tcp:listen(?PORT, [binary, {active, false}, {ip, {10, 80, 162, 236}}]),
+        {ok, LSocket} = gen_tcp:listen(?PORT, [binary, {active, false}, {ip, {10, 80, 161, 90}}]),
         spawn(fun() -> acceptState(LSocket) end),
         timer:sleep(infinity)
         end),

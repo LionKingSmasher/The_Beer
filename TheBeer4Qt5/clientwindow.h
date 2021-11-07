@@ -42,7 +42,8 @@ private slots:
     void on_ConnectButton_clicked();
 
 private:
-    static constexpr char* my_ip = "10.80.162.236";
+    static constexpr char* my_ip = "192.168.43.164";
+    static constexpr char* node_server_ip = "192.168.43.164";
     std::thread readProc;
 
 };
