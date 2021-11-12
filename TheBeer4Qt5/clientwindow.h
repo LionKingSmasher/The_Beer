@@ -41,9 +41,17 @@ private slots:
 
     void on_ConnectButton_clicked();
 
+    void on_sendButton_clicked();
+
+    void on_lineEdit_returnPressed();
+
+    void on_actionLoad_Chat_triggered();
+
+    void on_actionSave_Chat_triggered();
+
 private:
-    static constexpr char* my_ip = "192.168.43.164";
-    static constexpr char* node_server_ip = "192.168.43.164";
+    static constexpr char* my_ip = "172.18.8.55";
+    static constexpr char* node_server_ip = "172.18.8.55";
     std::thread readProc;
 
 };

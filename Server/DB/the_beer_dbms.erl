@@ -94,12 +94,26 @@ select_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
 %     Database = get_sha256(DatabaseName),
 %     load_All_File("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/TableSetting").
 
-delete_table(DatabaseName, TableName, [HeadAttribute | TailAttribute]) ->
+put_file_data(FileIO, [Head | Tail], Attribute) ->
+	ParseHead = binary_to_list(Head),
+	if 
+		ParseHead == Attribute ->
+			io:format("~s~n", [ParseHead]),
+			put_file_data(FileIO, Tail, Attribute);
+		Tail == [] ->
+			io:format(FileIO, "~s~n", [ParseHead]);
+		true ->
+			io:format(FileIO, "~s~n", [ParseHead]),
+			put_file_data(FileIO, Tail, Attribute)
+	end.
+
+delete_table(DatabaseName, TableName, Attribute) ->
     Table = get_sha256(DatabaseName ++ TableName),
     Database = get_sha256(DatabaseName),
     {ok, AllObjectBinary} = file:read_file("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash"),
     AllObject = binary:split(AllObjectBinary, <<"\n">>),
-    .
+    {ok, FileIO} = file:open("./The_Beer_Database/" ++ Database ++ "/" ++ Table ++ "/ObjectHash"),
+    put_file_data(FileIO, AllObject, Attribute).
 
 -spec insert_into(key(), key(), [any()]) -> ok | error.
 insert_into(DatabaseName, TableName, Value) ->
@@ -108,7 +122,7 @@ insert_into(DatabaseName, TableName, Value) ->
 %   ExistDataArr = binary:split(ExistFileData, <<"\n">>),
     {ok, ObjectIO} = file:open("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName++TableName) ++ "/" ++ get_sha256(TableObject), [write]),
 %   write_data_in_file(ObjectIO, ExistDataArr, [TableObject
-    io:format(ObjectIO, "~s", [TableObject]),
+%   io:format(ObjectIO, "~s", [TableObject]),
     file:close(ObjectIO),
     {ok, ExistData} = file:read_file("./The_Beer_Database/" ++ get_sha256(DatabaseName) ++ "/" ++ get_sha256(DatabaseName ++ TableName) ++ "/ObjectHash"),
     ExistDataArr = binary:split(ExistData, <<"\n">>),

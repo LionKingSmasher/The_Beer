@@ -15,7 +15,7 @@
 start_server() -> 
     init_database(),
     Pid = spawn_link(fun() ->
-        {ok, LSocket} = gen_tcp:listen(?PORT, [binary, {active, false}, {ip, {10, 80, 161, 90}}]),
+        {ok, LSocket} = gen_tcp:listen(?PORT, [binary, {active, false}, {ip, {172, 18, 8, 55}}]),
         spawn(fun() -> acceptState(LSocket) end),
         timer:sleep(infinity)
         end),
@@ -33,7 +33,7 @@ handler(ASocket) ->
             {ok, {Ip, _}} = inet:peername(ASocket),
             io:format("~s : exit", [inet:ntoa(Ip)]),
             gen_tcp:close(ASocket);
-        {tcp, ASocket, <<"get ip id=", X/binary>>} ->
+        {tcp, ASocket, <<"get ip id">>} ->
             LoadData = the_beer_dbms:select_table("TheBeer", "NodeList", [1]),
             io:format("~s~n", [binary_to_list(LoadData)]),
             handler(ASocket);
@@ -50,6 +50,7 @@ handler(ASocket) ->
     end.
 
 init_database() ->
+    the_beer_dbms:dbms_init(),
     the_beer_dbms:create_database("TheBeer"),
     the_beer_dbms:create_table("TheBeer", "NodeList", ['Name', 'IP'], ['String', 'String']),
     io:format("The Beer Database Initialized~n").

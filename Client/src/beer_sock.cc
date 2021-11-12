@@ -64,9 +64,9 @@ static void serverBinding(BeerSock* s){
 	clntSockSize = sizeof(s->clntAddr);
 	printf("size....\n");
 	s->other_clnt_sock = accept(s->server_sock, (struct sockaddr *)&s->clntAddr, &clntSockSize);
-	if(s->other_clnt_sock == -1)
-		error_msg("accept() error", -1);
-	s->connectServer(inet_ntoa(s->clntAddr.sin_addr), s->clntAddr.sin_port);
+	//if(s->other_clnt_sock == -1)
+	//	error_msg("accept() error", -1);
+	//s->connectServer(inet_ntoa(s->clntAddr.sin_addr), 9999);
 	s->server_open = true;
 	s->mtx.unlock();
 }
@@ -128,7 +128,7 @@ BeerSockStatus_t BeerSock::connectServer(std::string ip, uint16_t port){
 }
 
 BeerSockStatus_t BeerSock::writeServer(const char * msg) {
-	BEER_SOCK_FAILURE(write(this->other_clnt_sock, msg, strlen(msg))){
+	BEER_SOCK_FAILURE(write(this->my_clnt_sock, msg, strlen(msg))){
 		return BEERSOCK_FAIL;
 	}
 	return BEERSOCK_SUCCESS;

@@ -4,8 +4,11 @@
 
 #include <QStringList>
 #include <QMessageBox>
+#include <QDate>
 
 #define BEER_FAILURE(X) if (X == BEERSOCK_FAIL)
+
+char ip[INET_ADDRSTRLEN];
 
 ClientWindow::ClientWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -48,15 +51,16 @@ static void closeNodeServer(ClientWindow* ui){
 
  static void MessageReader(ClientWindow* win){
     memset(&win->beer->msg, 0, 256);
-//    printf("Test Message");
+    printf("Test Message");
     while(1){
         win->beer->mtx.lock();
-        if(win->beer->server_open == true){
+//        if(win->beer->server_open == true){
 //            printf("Test Message");
             BEER_FAILURE(win->beer->readClient()){
                 printf("Read Error\n");
             }
-        }
+            printf("%s\n", win->beer->msg);
+//        }
         win->beer->mtx.unlock();
     }
 }
@@ -80,14 +84,42 @@ void ClientWindow::on_Server_End_Button_clicked()
     pthread_cancel(this->readProcHandle);
 }
 
+QString ChatMessageSave(QString str){
+    QString filename = "save_message"
+            + QString::number(QDate::currentDate().year())
+            + QString::number(QDate::currentDate().month())
+            + QString::number(QDate::currentDate().day())
+            + QString::number(QTime::currentTime().hour())
+            + QString::number(QTime::currentTime().minute())
+            + QString::number(QTime::currentTime().second())
+            + QString::number(QTime::currentTime().msec());
+    int fd = open(filename.toStdString().c_str(), O_WRONLY | O_CREAT, 0644);
+    write(fd, str.toStdString().c_str(), str.toStdString().size());
+    close(fd);
+    return filename;
+}
+
 void ClientWindow::on_Server_Start_Button_clicked()
 {
     char msg[256];
-    ui->LogBox->setPlainText(ui->LogBox->toPlainText() + "Server Start!\n");
+    ui->LogBox->insertPlainText("Server Start!\n");
     beer->server_start();
+    while(!beer->server_open)
+        QApplication::processEvents();
+    if(!beer->client_open){
+        inet_ntop(AF_INET, &(beer->clntAddr), ip, INET_ADDRSTRLEN);
+        beer->connectServer(ip, 9999);
+    }
+    ui->LogBox->insertPlainText("Welcome! " + QString(ip) + "\n");
     readProc = std::thread(MessageReader, this);
     readProcHandle = readProc.native_handle();
     readProc.detach();
+//    while(!beer->server_open){
+//        QApplication::processEvents();
+//    }
+//    char ip[INET_ADDRSTRLEN];
+//    inet_ntop(AF_INET, &(beer->clntAddr), ip, INET_ADDRSTRLEN);
+//    beer->connectServer(ip, 9999);
     connectNodeServer(node_server_ip, 10000, this);
     std::string command = NodeServerCommand[0] + ui->userName->text().toStdString();
     write(nodeServer, command.c_str(), command.size()); // regist my ip & username
@@ -102,8 +134,8 @@ void ClientWindow::on_Server_Start_Button_clicked()
 
     while(1){
         if(strlen(beer->msg) > 0){
-            printf("Message %s\n", beer->msg);
-            ui->LogBox->setPlainText(ui->LogBox->toPlainText() + QString(beer->msg) + "\n");
+            //printf("Message %s\n", beer->msg);
+            ui->LogBox->insertPlainText(QString(ip) + " : " + QString(beer->msg) + "\n");
             memset(&beer->msg, 0, 1024);
         }
         QApplication::processEvents();
@@ -131,4 +163,33 @@ void ClientWindow::on_Server_Start_Button_clicked()
 void ClientWindow::on_ConnectButton_clicked()
 {
     beer->connectServer(ui->IPBox->text().toStdString().c_str(), ui->PortBOX->text().toUShort());
+    strcpy(ip, ui->IPBox->text().toStdString().c_str());
+    beer->client_open = true;
 }
+
+void ClientWindow::on_sendButton_clicked()
+{
+    beer->writeServer(ui->lineEdit->text().toStdString().c_str());
+    ui->LogBox->insertPlainText("Me: " + ui->lineEdit->text() + "\n");
+}
+
+
+void ClientWindow::on_lineEdit_returnPressed()
+{
+    beer->writeServer(ui->lineEdit->text().toStdString().c_str());
+    ui->LogBox->insertPlainText("Me: " + ui->lineEdit->text() + "\n");
+    ui->lineEdit->setText("");
+}
+
+
+void ClientWindow::on_actionLoad_Chat_triggered()
+{
+
+}
+
+
+void ClientWindow::on_actionSave_Chat_triggered()
+{
+    QString file = ChatMessageSave(ui->LogBox->toPlainText());
+}
+

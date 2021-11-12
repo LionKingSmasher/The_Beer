@@ -47,6 +47,7 @@ public:
 	int status;
 
 	bool server_open;
+	bool client_open;
 
 	char msg[1024];
 	
